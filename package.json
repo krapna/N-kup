@@ -1,0 +1,21 @@
+{
+  "name": "apka-predelani-php",
+  "version": "1.0.0",
+  "description": "Webová aplikace pro odesílání formulářů a emailů",
+  "main": "Server.js",
+  "scripts": {
+    "start": "node Server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.8",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "author": "Jan Kvapil",
+  "license": "MIT"
+}

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: apka-predelani-php
+    env: node
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: SMTP_USER
+        value: "kvapil@mejzlik.eu"
+      - key: SMTP_PASS
+        value: "aNKK2023mej+"
