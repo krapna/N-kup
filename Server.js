@@ -20,14 +20,17 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Nastavení Nodemailer SMTP
+// Nastavení Nodemailer SMTP pro Outlook
 const transporter = nodemailer.createTransport({
-    host: 'smtp.forpsi.com', // Používáš Forpsi
+    host: 'smtp.office365.com', // SMTP server pro Outlook/Office 365
     port: 587,
-    secure: false,
+    secure: false, // Musí být false pro STARTTLS
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
+    },
+    tls: {
+        ciphers: 'SSLv3'
     }
 });
 
