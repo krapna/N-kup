@@ -20,11 +20,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Nastavení Nodemailer SMTP pro Seznam.cz
+// Nastavení Nodemailer SMTP pro Zoho Mail
 const transporter = nodemailer.createTransport({
-    host: 'smtp.seznam.cz', // SMTP server Seznam.cz
+    host: 'smtp.zoho.eu', // SMTP server Zoho Mail
     port: 587,
-    secure: false, // Musí být false pro STARTTLS
+    secure: false, // STARTTLS musí být povolen
     auth: {
         user: process.env.SMTP_USER, // E-mail pro odesílání
         pass: process.env.SMTP_PASS  // Heslo k e-mailu
