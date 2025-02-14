@@ -1,54 +1,61 @@
-const express = require("express");
-const nodemailer = require("nodemailer");
-const bodyParser = require("body-parser");
-const dotenv = require("dotenv");
-
-dotenv.config();
-
+const nodemailer = require('nodemailer');
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
 const app = express();
-const port = 10000;
+const PORT = 3000;
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("public"));
 
+// Nastavení transportéru pro Zoho
 const transporter = nodemailer.createTransport({
-    host: "smtp.zoho.eu",
+    host: 'smtp.zoho.eu',
     port: 465,
-    secure: true, // Používá SSL
+    secure: true,
     auth: {
-        user: process.env.SMTP_USER,
+        user: process.env.SMTP_USER, 
         pass: process.env.SMTP_PASS
     }
 });
 
-app.post("/send-email", async (req, res) => {
-    try {
-        const { recipientEmail, messageText, orderNumber, filledData } = req.body;
+// Endpoint pro odesílání emailů
+app.post('/sendEmails', (req, res) => {
+    const recipientEmail = req.body.recipientEmail;
+    const orderNumber = req.body.orderNumber;
+    const messageText = req.body.messageText;
+    const filledData = req.body.filledData;
 
-        // První e-mail pro příjemce
-        await transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to: recipientEmail,
-            subject: `Objednávka č. ${orderNumber}`,
-            text: messageText
-        });
+    // První email pro příjemce
+    transporter.sendMail({
+        from: process.env.SMTP_USER,
+        to: recipientEmail,
+        subject: `Objednávka č. ${orderNumber}`,
+        text: messageText
+    }, (error, info) => {
+        if (error) {
+            return res.status(500).send(`Chyba při odesílání e-mailu: ${error}`);
+        }
+        console.log('Email pro příjemce byl odeslán:', info.response);
 
-        // Druhý e-mail pro tebe (kvapil@mejzlik.eu)
-        await transporter.sendMail({
+        // Druhý email pro kvapil@mejzlik.eu
+        transporter.sendMail({
             from: process.env.SMTP_USER,
-            to: "kvapil@mejzlik.eu",
+            to: 'kvapil@mejzlik.eu',
             subject: `Kopie: Objednávka č. ${orderNumber}`,
             text: filledData
+        }, (error, info) => {
+            if (error) {
+                return res.status(500).send(`Chyba při odesílání e-mailu: ${error}`);
+            }
+            console.log('Email pro kvapil@mejzlik.eu byl odeslán:', info.response);
+            res.status(200).send('Oba emaily byly úspěšně odeslány!');
         });
-
-        res.status(200).send("E-maily byly úspěšně odeslány!");
-    } catch (error) {
-        console.error("Chyba při odesílání e-mailu:", error);
-        res.status(500).send("Nepodařilo se odeslat e-mail.");
-    }
+    });
 });
 
-app.listen(port, () => {
-    console.log(`Server běží na portu ${port}`);
+// Statické soubory
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.listen(PORT, () => {
+    console.log(`Server běží na http://localhost:${PORT}`);
 });
