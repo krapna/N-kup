@@ -1,45 +1,32 @@
-require('dotenv').config();
-const express = require('express');
-const nodemailer = require('nodemailer');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
+const express = require("express");
+const nodemailer = require("nodemailer");
+const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = 10000;
 
-// Middleware
-app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-// Obsluha statických souborů (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Výchozí route pro načtení hlavní stránky
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Nastavení Nodemailer SMTP pro Zoho Mail
 const transporter = nodemailer.createTransport({
-    host: 'smtp.zoho.eu', // SMTP server Zoho Mail
-    port: 587,
-    secure: false, // STARTTLS musí být povolen
+    host: "smtp.zoho.eu",
+    port: 465,
+    secure: true, // Používá SSL
     auth: {
-        user: process.env.SMTP_USER, // E-mail pro odesílání
-        pass: process.env.SMTP_PASS  // Heslo k e-mailu
-    },
-    tls: {
-        rejectUnauthorized: false
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
     }
 });
 
-// API endpoint pro odeslání emailu
-app.post('/sendEmail', async (req, res) => {
-    const { recipientEmail, orderNumber, messageText, filledData } = req.body;
-
+app.post("/send-email", async (req, res) => {
     try {
-        // První email pro příjemce
+        const { recipientEmail, messageText, orderNumber, filledData } = req.body;
+
+        // První e-mail pro příjemce
         await transporter.sendMail({
             from: process.env.SMTP_USER,
             to: recipientEmail,
@@ -47,22 +34,21 @@ app.post('/sendEmail', async (req, res) => {
             text: messageText
         });
 
-        // Druhý email jako kopie pro tvůj e-mail
+        // Druhý e-mail pro tebe (kvapil@mejzlik.eu)
         await transporter.sendMail({
             from: process.env.SMTP_USER,
-            to: 'kvapil@mejzlik.eu',  // Tvůj e-mail kam se posílá kopie
+            to: "kvapil@mejzlik.eu",
             subject: `Kopie: Objednávka č. ${orderNumber}`,
             text: filledData
         });
 
-        res.status(200).json({ message: 'E-maily byly úspěšně odeslány.' });
+        res.status(200).send("E-maily byly úspěšně odeslány!");
     } catch (error) {
-        console.error('Chyba při odesílání emailu:', error);
-        res.status(500).json({ error: 'Chyba při odesílání emailu.' });
+        console.error("Chyba při odesílání e-mailu:", error);
+        res.status(500).send("Nepodařilo se odeslat e-mail.");
     }
 });
 
-// Spuštění serveru
-app.listen(PORT, () => {
-    console.log(`Server běží na portu ${PORT}`);
+app.listen(port, () => {
+    console.log(`Server běží na portu ${port}`);
 });
