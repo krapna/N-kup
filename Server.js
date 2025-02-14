@@ -20,17 +20,17 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Nastavení Nodemailer SMTP pro Outlook
+// Nastavení Nodemailer SMTP pro Seznam.cz
 const transporter = nodemailer.createTransport({
-    host: 'smtp.office365.com', // SMTP server pro Outlook/Office 365
+    host: 'smtp.seznam.cz', // SMTP server Seznam.cz
     port: 587,
     secure: false, // Musí být false pro STARTTLS
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.SMTP_USER, // E-mail pro odesílání
+        pass: process.env.SMTP_PASS  // Heslo k e-mailu
     },
     tls: {
-        ciphers: 'SSLv3'
+        rejectUnauthorized: false
     }
 });
 
@@ -50,7 +50,7 @@ app.post('/sendEmail', async (req, res) => {
         // Druhý email jako kopie pro tvůj e-mail
         await transporter.sendMail({
             from: process.env.SMTP_USER,
-            to: process.env.SMTP_USER,
+            to: 'kvapil@mejzlik.eu',  // Tvůj e-mail kam se posílá kopie
             subject: `Kopie: Objednávka č. ${orderNumber}`,
             text: filledData
         });
