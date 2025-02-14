@@ -8,6 +8,6 @@ services:
     plan: free
     envVars:
       - key: SMTP_USER
-        value: "kvapil@mejzlik.eu"
+        value: "krapna@seznam.cz"
       - key: SMTP_PASS
-        value: "aNKK2023mej+"
+        value: "02krapna"
