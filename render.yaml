@@ -8,6 +8,6 @@ services:
     plan: free
     envVars:
       - key: SMTP_USER
-        value: "krapna@seznam.cz"
+        value: "nakupmej@zohomail.eu"
       - key: SMTP_PASS
-        value: "02krapna"
+        value: "Dablborec369369"
